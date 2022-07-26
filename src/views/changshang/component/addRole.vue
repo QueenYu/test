@@ -62,6 +62,10 @@ export default defineComponent({
 		const onSubmit = () => {
 			changshang.firmsadd(state.ruleForm).then(res => {
 				state.isShowDialog = false;
+				ElMessage.success({
+					message: res.msg,
+					type: "success"
+				});
 				emit('fatherMethod');
 			})
 		};

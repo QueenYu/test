@@ -5,6 +5,7 @@ import request from '/@/utils/request';
  * @method firmsedit 编辑
  * @method firmsadd 添加
  * @method firmsdel 删除
+ * @method firmsall 所有厂商
  * @method firmLineslist 列表
  * @method firmLinesedit 编辑
  * @method firmLinesadd 添加
@@ -44,6 +45,12 @@ export function firms() {
 
 export function firmLines() {
 	return {
+		firmsall: () => {
+			return request({
+				url: '/rest/web/v1/firms/list',
+				method: 'get'
+			});
+		},
 		firmLineslist: (params: any) => {
 			return request({
 				url: '/rest/web/v1/firmLines',

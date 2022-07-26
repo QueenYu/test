@@ -46,8 +46,8 @@
 			>
 			</el-pagination>
 		</el-card>
-		<AddRole ref="addRoleRef" />
-		<EditRole ref="editRoleRef" />
+		<AddRole ref="addRoleRef" @fatherMethod="initTableData"/>
+		<EditRole ref="editRoleRef" @fatherMethod="initTableData"/>
 	</div>
 </template>
 
@@ -104,7 +104,14 @@ export default defineComponent({
 				type: 'warning',
 			})
 				.then(() => {
-					ElMessage.success('删除成功');
+					changshang.firmLinesdel(row.id).then(res => {
+						if(res.data.code == 200){
+							ElMessage.success(res.data.msg);
+							initTableData();
+						}else{
+							ElMessage.error(res.data.msg);
+						}
+					})
 				})
 				.catch(() => {});
 		};
@@ -134,6 +141,7 @@ export default defineComponent({
 			onHandleSizeChange,
 			onHandleCurrentChange,
 			search,
+			initTableData,
 			...toRefs(state),
 		};
 	},

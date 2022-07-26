@@ -1,27 +1,26 @@
 <template>
 	<div class="system-add-role-container">
 		<el-dialog title="添加厂商线路" v-model="isShowDialog" width="569px">
-			<el-form :model="ruleForm" size="default" label-width="120px">
-				<el-form-item label="厂商名称">
-					<el-select size="default" placeholder="请选择" clearable>
-						<el-option key="1" label="联通CDN" value="1" />
-						<el-option key="2" label="电信云" value="2" />
-						<el-option key="3" label="移动云" value="3" />
+			<el-form  @submit.native.prevent ref="formRef" :rules="rules" :model="ruleForm" size="default" label-width="135px">
+				<el-form-item label="厂商名称" prop="firmId">
+					<el-select size="default" placeholder="请选择" v-model="ruleForm.firmId" clearable>
+						<el-option :label="item.name" :value="item.id"  v-for="(item,index) in namelist"/>
 					</el-select>
 				</el-form-item>
-				<el-form-item label="线路类型">
-					<el-select size="default" placeholder="请选择" clearable>
-						<el-option key="1" label="图片小文件" value="1" />
-						<el-option key="2" label="音视频点播" value="2" />
-						<el-option key="3" label="大文件下载" value="3" />
+				<el-form-item label="线路类型" prop="lineType">
+					<el-select size="default" placeholder="请选择" v-model="ruleForm.lineType" clearable>
+						<el-option label="图片小文件" :value="1" />
+						<el-option label="音视频点播" :value="2" />
+						<el-option label="大文件下载" :value="3" />
+						<el-option label="视频直播" :value="4" />
 					</el-select>
 				</el-form-item>
-				<el-form-item label="厂商CNAME域名">
-					<el-input v-model="ruleForm.roleName" placeholder="请输入厂商CNAME域名" clearable>
+				<el-form-item label="厂商CNAME域名" prop="cname">
+					<el-input v-model="ruleForm.cname" placeholder="请输入厂商CNAME域名" clearable>
 					</el-input>
 				</el-form-item>
 				<el-form-item label="备注">
-					<el-input v-model="ruleForm.roleName" type="textarea" :rows="4" placeholder="请输入备注" clearable>
+					<el-input v-model="ruleForm.remark" type="textarea" :rows="4" placeholder="请输入备注" clearable>
 					</el-input>
 				</el-form-item>
 			</el-form>
@@ -39,46 +38,53 @@
 	import {
 		reactive,
 		toRefs,
-		defineComponent
+		defineComponent,
+		onMounted,
+		ref
 	} from 'vue';
-
-	// 定义接口来定义对象的类型
-	interface MenuDataTree {
-		id: number;
-		label: string;
-		children ? : MenuDataTree[];
-	}
-	interface RoleState {
-		isShowDialog: boolean;
-		ruleForm: {
-			roleName: string;
-			describe: string;
-		};
-		menuData: Array < MenuDataTree > ;
-		menuProps: {
-			children: string;
-			label: string;
-		};
-	}
-
+	import {
+		firmLines
+	} from '/@/api/changshang/index';
+	import {
+		ElMessageBox,
+		ElMessage
+	} from 'element-plus';
 	export default defineComponent({
-		setup() {
-			const state = reactive < RoleState > ({
+		setup(props, { emit }) {
+			const changshang = firmLines();
+			const state = reactive({
 				isShowDialog: false,
 				ruleForm: {
-					roleName: '', // 名称
-					describe: '', // 描述
-				},
-				menuData: [],
-				menuProps: {
-					children: 'children',
-					label: 'label',
-				},
+					cname: "",
+					firmId: "",
+					firmName: "",
+					lineType: "",
+					remark: "",
+				}
 			});
+			
+			// 验证
+			const rules = reactive({
+				firmId: [{
+					required: true,
+					message: '请选择厂商名称',
+					trigger: 'change'
+				}],
+				lineType: [{
+					required: true,
+					message: '请选择线路类型',
+					trigger: 'change'
+				}],
+				cname: [{
+					required: true,
+					message: '请输入厂商CNAME域名',
+					trigger: 'blur'
+				}],
+			})
+			
 			// 打开弹窗
 			const openDialog = () => {
 				state.isShowDialog = true;
-				getMenuData();
 			};
 			// 关闭弹窗
 			const closeDialog = () => {
@@ -90,111 +96,40 @@
 			};
 			// 新增
 			const onSubmit = () => {
-				closeDialog();
+				if ((Object.keys(rules).filter(i => !state.ruleForm[i])).length <= 0) {
+					namelist.value.forEach((item,index) => {
+						if(item.id == state.ruleForm.firmId){
+							state.ruleForm.firmName = item.name
+							changshang.firmLinesadd(state.ruleForm).then(res => {
+								closeDialog();
+								ElMessage.success({
+									message: res.data.msg,
+									type: "success"
+								});
+								emit('fatherMethod');
+							})
+						}
+					});
+				} else {
+					ElMessage.warning('*号为必填项，请补全！')
+				}
 			};
-			// 获取菜单结构数据
-			const getMenuData = () => {
-				state.menuData = [{
-						id: 1,
-						label: '系统管理',
-						children: [{
-								id: 11,
-								label: '菜单管理',
-								children: [{
-										id: 111,
-										label: '菜单新增',
-									},
-									{
-										id: 112,
-										label: '菜单修改',
-									},
-									{
-										id: 113,
-										label: '菜单删除',
-									},
-									{
-										id: 114,
-										label: '菜单查询',
-									},
-								],
-							},
-							{
-								id: 12,
-								label: '角色管理',
-								children: [{
-										id: 121,
-										label: '角色新增',
-									},
-									{
-										id: 122,
-										label: '角色修改',
-									},
-									{
-										id: 123,
-										label: '角色删除',
-									},
-									{
-										id: 124,
-										label: '角色查询',
-									},
-								],
-							},
-							{
-								id: 13,
-								label: '用户管理',
-								children: [{
-										id: 131,
-										label: '用户新增',
-									},
-									{
-										id: 132,
-										label: '用户修改',
-									},
-									{
-										id: 133,
-										label: '用户删除',
-									},
-									{
-										id: 134,
-										label: '用户查询',
-									},
-								],
-							},
-						],
-					},
-					{
-						id: 2,
-						label: '权限管理',
-						children: [{
-								id: 21,
-								label: '前端控制',
-								children: [{
-										id: 211,
-										label: '页面权限',
-									},
-									{
-										id: 212,
-										label: '页面权限',
-									},
-								],
-							},
-							{
-								id: 22,
-								label: '后端控制',
-								children: [{
-									id: 221,
-									label: '页面权限',
-								}, ],
-							},
-						],
-					},
-				];
-			};
+			
+			const namelist = ref([])
+			onMounted(() => {
+				changshang.firmsall().then(res => {
+					namelist.value = res.data.data
+				})
+			})
+			
 			return {
 				openDialog,
 				closeDialog,
 				onCancel,
 				onSubmit,
+				changshang,
+				namelist,
+				rules,
 				...toRefs(state),
 			};
 		},
