@@ -1,10 +1,11 @@
 <template>
 	<div class="system-add-role-container">
 		<el-dialog title="添加厂商线路" v-model="isShowDialog" width="569px">
-			<el-form  @submit.native.prevent ref="formRef" :rules="rules" :model="ruleForm" size="default" label-width="135px">
+			<el-form @submit.native.prevent ref="formRef" :rules="rules" :model="ruleForm" size="default"
+				label-width="135px">
 				<el-form-item label="厂商名称" prop="firmId">
 					<el-select size="default" placeholder="请选择" v-model="ruleForm.firmId" clearable>
-						<el-option :label="item.name" :value="item.id"  v-for="(item,index) in namelist"/>
+						<el-option :label="item.name" :value="item.id" v-for="(item,index) in namelist" />
 					</el-select>
 				</el-form-item>
 				<el-form-item label="线路类型" prop="lineType">
@@ -50,7 +51,9 @@
 		ElMessage
 	} from 'element-plus';
 	export default defineComponent({
-		setup(props, { emit }) {
+		setup(props, {
+			emit
+		}) {
 			const changshang = firmLines();
 			const state = reactive({
 				isShowDialog: false,
@@ -62,7 +65,7 @@
 					remark: "",
 				}
 			});
-			
+
 			// 验证
 			const rules = reactive({
 				firmId: [{
@@ -81,10 +84,13 @@
 					trigger: 'blur'
 				}],
 			})
-			
+
 			// 打开弹窗
 			const openDialog = () => {
 				state.isShowDialog = true;
+				Object.keys(state.ruleForm).map(key => {
+					delete state.ruleForm[key]
+				})
 			};
 			// 关闭弹窗
 			const closeDialog = () => {
@@ -97,8 +103,8 @@
 			// 新增
 			const onSubmit = () => {
 				if ((Object.keys(rules).filter(i => !state.ruleForm[i])).length <= 0) {
-					namelist.value.forEach((item,index) => {
-						if(item.id == state.ruleForm.firmId){
+					namelist.value.forEach((item, index) => {
+						if (item.id == state.ruleForm.firmId) {
 							state.ruleForm.firmName = item.name
 							changshang.firmLinesadd(state.ruleForm).then(res => {
 								closeDialog();
@@ -114,14 +120,14 @@
 					ElMessage.warning('*号为必填项，请补全！')
 				}
 			};
-			
+
 			const namelist = ref([])
 			onMounted(() => {
 				changshang.firmsall().then(res => {
 					namelist.value = res.data.data
 				})
 			})
-			
+
 			return {
 				openDialog,
 				closeDialog,

@@ -49,6 +49,9 @@ export default defineComponent({
 		// 打开弹窗
 		const openDialog = () => {
 			state.isShowDialog = true;
+			Object.keys(state.ruleForm).map(key => {
+				delete state.ruleForm[key]
+			})
 		};
 		// 关闭弹窗
 		const closeDialog = () => {
