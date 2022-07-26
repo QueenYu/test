@@ -2,8 +2,8 @@
 	<div class="system-role-container">
 		<el-card shadow="hover">
 			<div class="system-user-search mb15">
-				<el-input size="default" placeholder="请输入关键字" style="max-width: 180px"> </el-input>
-				<el-button size="default" type="primary" class="ml10">
+				<el-input size="default" placeholder="请输入关键字" style="max-width: 180px" v-model="tableData.param.searchKey"> </el-input>
+				<el-button size="default" type="primary" class="ml10" @click="search()">
 					<el-icon>
 						<ele-Search />
 					</el-icon>
@@ -18,10 +18,10 @@
 			</div>
 			<el-table :data="tableData.data" style="width: 100%">
 				<el-table-column type="index" label="序号" width="60" />
-				<el-table-column prop="roleName" label="厂商名称" show-overflow-tooltip></el-table-column>
-				<el-table-column prop="roleSign" label="线路类型" show-overflow-tooltip></el-table-column>
-				<el-table-column prop="roleSign" label="备注" show-overflow-tooltip></el-table-column>
-				<el-table-column prop="roleSign" label="CNAME" show-overflow-tooltip></el-table-column>
+				<el-table-column prop="firmName" label="厂商名称" show-overflow-tooltip></el-table-column>
+				<el-table-column prop="lineTypeValue" label="线路类型" show-overflow-tooltip></el-table-column>
+				<el-table-column prop="remark" label="备注" show-overflow-tooltip></el-table-column>
+				<el-table-column prop="cname" label="CNAME" show-overflow-tooltip></el-table-column>
 				<el-table-column prop="createTime" label="创建时间" show-overflow-tooltip></el-table-column>
 				<el-table-column label="操作" width="100">
 					<template #default="scope">
@@ -38,7 +38,7 @@
 				class="mt15"
 				:pager-count="5"
 				:page-sizes="[10, 20, 30]"
-				v-model:current-page="tableData.param.pageNum"
+				v-model:current-page="tableData.param.page"
 				background
 				v-model:page-size="tableData.param.pageSize"
 				layout="total, sizes, prev, pager, next, jumper"
@@ -56,27 +56,10 @@ import { toRefs, reactive, onMounted, ref, defineComponent } from 'vue';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import AddRole from '/@/views/diaodu/xianlu/component/addRole.vue';
 import EditRole from '/@/views/diaodu/xianlu/component/editRole.vue';
-
+	import {
+		firmLines
+	} from '/@/api/changshang/index';
 // 定义接口来定义对象的类型
-interface TableData {
-	roleName: string;
-	roleSign: string;
-	describe: string;
-	sort: number;
-	status: boolean;
-	createTime: string;
-}
-interface TableDataState {
-	tableData: {
-		data: Array<TableData>;
-		total: number;
-		loading: boolean;
-		param: {
-			pageNum: number;
-			pageSize: number;
-		};
-	};
-}
 
 export default defineComponent({
 	name: 'systemRole',
@@ -84,47 +67,26 @@ export default defineComponent({
 	setup() {
 		const addRoleRef = ref();
 		const editRoleRef = ref();
-		const state = reactive<TableDataState>({
+		const changshang = firmLines();
+		
+		const state = reactive({
 			tableData: {
 				data: [],
 				total: 0,
 				loading: false,
 				param: {
-					pageNum: 1,
+					page: 1,
 					pageSize: 10,
+					searchKey:''
 				},
 			},
 		});
 		// 初始化表格数据
 		const initTableData = () => {
-			let data = [
-				{
-					roleName: '123',
-					roleSign:'123',
-					describe: '123',
-					sort: 1,
-					status: false,
-					createTime: '12'
-				},
-				{
-					roleName: '123',
-					roleSign:'123',
-					describe: '123',
-					sort: 1,
-					status: false,
-					createTime: '12'
-				},
-				{
-					roleName: '123',
-					roleSign:'123',
-					describe: '123',
-					sort: 1,
-					status: false,
-					createTime: '12'
-				}
-			]
-			state.tableData.data = data;
-			state.tableData.total = state.tableData.data.length;
+			changshang.firmLineslist(state.tableData.param).then(res => {
+				state.tableData.data = res.data.data.list;
+				state.tableData.total = Number(res.data.data.total);
+			})
 		};
 		// 打开新增角色弹窗
 		const onOpenAddRole = () => {
@@ -154,6 +116,11 @@ export default defineComponent({
 		const onHandleCurrentChange = (val: number) => {
 			state.tableData.param.pageNum = val;
 		};
+		
+		const search = () => {
+			initTableData();
+		};
+		
 		// 页面加载时
 		onMounted(() => {
 			initTableData();
@@ -166,6 +133,7 @@ export default defineComponent({
 			onRowDel,
 			onHandleSizeChange,
 			onHandleCurrentChange,
+			search,
 			...toRefs(state),
 		};
 	},

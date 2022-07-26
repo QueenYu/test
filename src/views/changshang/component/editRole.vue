@@ -3,9 +3,9 @@
 		<el-dialog title="修改厂商" v-model="isShowDialog" width="569px">
 			<el-form :model="ruleForm" size="default" label-width="90px">
 				<el-form-item label="厂商名称">
-					<el-input v-model="ruleForm.roleName" placeholder="请输入厂商名称" clearable></el-input>
+					<el-input v-model="ruleForm.name" placeholder="请输入厂商名称" clearable></el-input>
 				</el-form-item><el-form-item label="备注">
-					<el-input v-model="ruleForm.describe" type="textarea" :rows="4" placeholder="请输入" ></el-input>
+					<el-input v-model="ruleForm.remark" type="textarea" :rows="4" placeholder="请输入" ></el-input>
 				</el-form-item>
 			</el-form>
 			<template #footer>
@@ -20,7 +20,13 @@
 
 <script lang="ts">
 import { reactive, toRefs, defineComponent } from 'vue';
-
+	import {
+		firms
+	} from '/@/api/changshang/index';
+	import {
+		ElMessageBox,
+		ElMessage
+	} from 'element-plus';
 // 定义接口来定义对象的类型
 interface MenuDataTree {
 	id: number;
@@ -37,36 +43,26 @@ interface DialogRow {
 interface RoleState {
 	isShowDialog: boolean;
 	ruleForm: DialogRow;
-	menuData: Array<MenuDataTree>;
-	menuProps: {
-		children: string;
-		label: string;
-	};
 }
 
 export default defineComponent({
 	name: 'systemEditRole',
 	setup() {
+		const changshang = firms();
 		const state = reactive<RoleState>({
 			isShowDialog: false,
 			ruleForm: {
-				roleName: '', // 角色名称
-				roleSign: '', // 角色标识
-				sort: 0, // 排序
-				status: true, // 角色状态
-				describe: '', // 角色描述
-			},
-			menuData: [],
-			menuProps: {
-				children: 'children',
-				label: 'label',
-			},
+				createTime: "",
+				id: "",
+				name: "",
+				remark: "",
+				updateTime: ""
+			}
 		});
 		// 打开弹窗
 		const openDialog = (row: DialogRow) => {
 			state.ruleForm = row;
 			state.isShowDialog = true;
-			getMenuData();
 		};
 		// 关闭弹窗
 		const closeDialog = () => {
@@ -74,124 +70,21 @@ export default defineComponent({
 		};
 		// 取消
 		const onCancel = () => {
-			closeDialog();
+			state.isShowDialog = false;
 		};
 		// 新增
 		const onSubmit = () => {
-			closeDialog();
+			changshang.firmsadd(state.ruleForm).then(res => {
+				state.isShowDialog = false;
+			})
 		};
-		// 获取菜单结构数据
-		const getMenuData = () => {
-			state.menuData = [
-				{
-					id: 1,
-					label: '系统管理',
-					children: [
-						{
-							id: 11,
-							label: '菜单管理',
-							children: [
-								{
-									id: 111,
-									label: '菜单新增',
-								},
-								{
-									id: 112,
-									label: '菜单修改',
-								},
-								{
-									id: 113,
-									label: '菜单删除',
-								},
-								{
-									id: 114,
-									label: '菜单查询',
-								},
-							],
-						},
-						{
-							id: 12,
-							label: '角色管理',
-							children: [
-								{
-									id: 121,
-									label: '角色新增',
-								},
-								{
-									id: 122,
-									label: '角色修改',
-								},
-								{
-									id: 123,
-									label: '角色删除',
-								},
-								{
-									id: 124,
-									label: '角色查询',
-								},
-							],
-						},
-						{
-							id: 13,
-							label: '用户管理',
-							children: [
-								{
-									id: 131,
-									label: '用户新增',
-								},
-								{
-									id: 132,
-									label: '用户修改',
-								},
-								{
-									id: 133,
-									label: '用户删除',
-								},
-								{
-									id: 134,
-									label: '用户查询',
-								},
-							],
-						},
-					],
-				},
-				{
-					id: 2,
-					label: '权限管理',
-					children: [
-						{
-							id: 21,
-							label: '前端控制',
-							children: [
-								{
-									id: 211,
-									label: '页面权限',
-								},
-								{
-									id: 212,
-									label: '页面权限',
-								},
-							],
-						},
-						{
-							id: 22,
-							label: '后端控制',
-							children: [
-								{
-									id: 221,
-									label: '页面权限',
-								},
-							],
-						},
-					],
-				},
-			];
-		};
+		
 		return {
 			openDialog,
 			closeDialog,
 			onCancel,
 			onSubmit,
+			changshang,
 			...toRefs(state),
 		};
 	},

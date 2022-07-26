@@ -18,17 +18,15 @@
 		</el-row>
 		<el-row :gutter="15" class="home-card-one mb15">
 			<el-col>
-				<div class="home-card-item">
-					<el-table :data="tableData" style="width: 100%">
-						<el-table-column prop="roleName" label="类型" show-overflow-tooltip></el-table-column>
-						<el-table-column prop="roleSign" label="厂商" show-overflow-tooltip></el-table-column>
-						<el-table-column prop="roleSign" label="总任务数字" show-overflow-tooltip></el-table-column>
-						<el-table-column prop="roleSign" label="处理中" show-overflow-tooltip></el-table-column>
-						<el-table-column prop="roleSign" label="成功" show-overflow-tooltip></el-table-column>
-						<el-table-column prop="roleSign" label="失败" show-overflow-tooltip></el-table-column>
-						<el-table-column prop="roleSign" label="成功率" show-overflow-tooltip></el-table-column>
-					</el-table>
-				</div>
+				<el-table :data="tableData" style="width: 100%">
+					<el-table-column prop="roleName" label="类型" show-overflow-tooltip></el-table-column>
+					<el-table-column prop="roleSign" label="厂商" show-overflow-tooltip></el-table-column>
+					<el-table-column prop="roleSign" label="总任务数字" show-overflow-tooltip></el-table-column>
+					<el-table-column prop="roleSign" label="处理中" show-overflow-tooltip></el-table-column>
+					<el-table-column prop="roleSign" label="成功" show-overflow-tooltip></el-table-column>
+					<el-table-column prop="roleSign" label="失败" show-overflow-tooltip></el-table-column>
+					<el-table-column prop="roleSign" label="成功率" show-overflow-tooltip></el-table-column>
+				</el-table>
 			</el-col>
 		</el-row>
 		<el-row :gutter="15" class="home-card-two mb15">
@@ -407,22 +405,6 @@
 			);
 
 			const tableData = ref([{
-					roleName: '123',
-					roleSign: '123',
-					describe: '123',
-					sort: 1,
-					status: false,
-					createTime: '12'
-				},
-				{
-					roleName: '123',
-					roleSign: '123',
-					describe: '123',
-					sort: 1,
-					status: false,
-					createTime: '12'
-				},
-				{
 					roleName: '123',
 					roleSign: '123',
 					describe: '123',

@@ -1,19 +1,37 @@
 <template>
 	<div class="system-edit-role-container">
 		<el-dialog title="编辑用户" v-model="isShowDialog" width="569px">
-			<el-form :model="ruleForm" size="default" label-width="90px">
+			<el-form :model="ruleForm" size="default" label-width="110px">
+				<h4 style="margin-bottom:20px">基本信息</h4>
 				<el-form-item label="角色名称">
 					<el-input v-model="ruleForm.roleName" placeholder="请输入角色名称" clearable></el-input>
 				</el-form-item>
 				<el-form-item label="备注">
 					<el-input v-model="ruleForm.describe" type="textarea" :rows="4" placeholder="请输入" ></el-input>
 				</el-form-item>
-				<el-form-item label="选择角色">
-					<el-select size="default" placeholder="选择功能权限" clearable>
-						<el-option key="1" label="厂商A" value="1" />
-						<el-option key="2" label="厂商B" value="2" />
-						<el-option key="3" label="厂商C" value="3" />
-					</el-select>
+				<h4 style="margin-bottom:20px">设置角色权限</h4>
+				<el-form-item label="选择功能权限">
+					<el-checkbox  label="厂商管理" size="mini" />
+					<el-checkbox  label="域名管理" size="mini" />
+					<el-checkbox  label="证书管理" size="mini" />
+					<el-checkbox  label="调度管理" size="mini" />
+					<el-checkbox  label="刷新预热" size="mini" />
+					<el-checkbox  label="封禁" size="mini" />
+					<el-checkbox  label="资源监控" size="mini" />
+					<el-checkbox  label="用户中心" size="mini" />
+				</el-form-item>
+				<el-form-item label="用户中心">
+					<el-table :data="datare" style="width: 100%">
+						<el-table-column prop="roleName" label="功能" show-overflow-tooltip></el-table-column>
+						<el-table-column label="操作" width="200">
+							<template #default="scope">
+								<el-switch
+								    class="ml-2"
+								    style="--el-switch-on-color: #ff4949; --el-switch-off-color: #13ce66"
+								  />
+							</template>
+						</el-table-column>
+					</el-table>
 				</el-form-item>
 			</el-form>
 			<template #footer>
@@ -27,7 +45,7 @@
 </template>
 
 <script lang="ts">
-import { reactive, toRefs, defineComponent } from 'vue';
+import { reactive, toRefs, defineComponent,ref } from 'vue';
 
 // 定义接口来定义对象的类型
 interface MenuDataTree {
@@ -88,6 +106,42 @@ export default defineComponent({
 		const onSubmit = () => {
 			closeDialog();
 		};
+		
+		const datare = ref([
+				{
+					roleName: '基本信息',
+					roleSign:'123',
+					describe: '123',
+					sort: 1,
+					status: false,
+					createTime: '12'
+				},
+				{
+					roleName: '用户管理',
+					roleSign:'123',
+					describe: '123',
+					sort: 1,
+					status: false,
+					createTime: '12'
+				},
+				{
+					roleName: '角色管理',
+					roleSign:'123',
+					describe: '123',
+					sort: 1,
+					status: false,
+					createTime: '12'
+				},
+				{
+					roleName: '安全设置',
+					roleSign:'123',
+					describe: '123',
+					sort: 1,
+					status: false,
+					createTime: '12'
+				}
+			])
+		
 		// 获取菜单结构数据
 		const getMenuData = () => {
 			state.menuData = [
@@ -200,6 +254,7 @@ export default defineComponent({
 			closeDialog,
 			onCancel,
 			onSubmit,
+			datare,
 			...toRefs(state),
 		};
 	},

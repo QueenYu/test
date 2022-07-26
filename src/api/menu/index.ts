@@ -5,6 +5,7 @@ import request from '/@/utils/request';
  * 后端控制路由，isRequestRoutes 为 true，则开启后端控制路由
  * @method getMenuAdmin 获取后端动态路由菜单(admin)
  * @method getMenuTest 获取后端动态路由菜单(test)
+ * @method test 获取后端动态路由菜单(test)
  */
 export function useMenuApi() {
 	return {
@@ -18,6 +19,13 @@ export function useMenuApi() {
 		getMenuTest: (params?: object) => {
 			return request({
 				url: '/gitee/lyt-top/vue-next-admin-images/raw/master/menu/testMenu.json',
+				method: 'get',
+				params,
+			});
+		},
+		test: (params?: object) => {
+			return request({
+				url: '/metrics-rules/alertTypes',
 				method: 'get',
 				params,
 			});
